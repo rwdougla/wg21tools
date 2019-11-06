@@ -1,0 +1,272 @@
+
+<!DOCTYPE html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252"></head><body><header>
+<style type="text/css">
+    body {
+		background: #002b36;
+		font-family: "Courier";
+		color: #cb4b16;
+	}
+	a:link {color:#268bd2;}
+	a:visited {color:#d33682;}
+	.compact { margin-top: 1px, margin-bottom: 1px; }
+</style>
+</header>
+<pre id="help">
+<i>Name</i>: # Introduces or identifies a person/entity. Gets a color that will be used for that <i>Name</i> throughout minutes
+m/n/o/p/q # Introduces a straw poll. Converted into a table. Should be on own line
+Sanitizes &amp, &lt, and &gt
+Replaces line endings with &ltbr/&gt
+Example:
+TD: The Dude
+WS: Walter Sobchak
+
+TD: What's in the ******' carrier? 
+WS: Huh? Oh, that's Cynthia's dog. I think it's a Pomeranian. I can't leave him home alone or he eats the furniture. I'm watching him while Cynthia and Marty Ackerman are in Hawaii. 
+TD: You brought the ******' Pomeranian bowling? 
+WS: What do you mean brought it bowling, Dude? I didn't rent it shoes. I'm not buying it a ******* beer. He's not taking your ******* turn, Dude. 
+TD: Man, if my ******' ex-wife asked me to take care of her ******' dog while she and her boyfriend went to Honolulu I'd tell her to go **** herself. 
+
+1/0/1/0/1
+</pre>
+<input type="button" id="btn_run" onclick="generateText();" value="Clean:">
+<br>
+<textarea id="textarea" name="code" cols="160" rows="40" wrap="off"></textarea>
+<p id="viewable"></p>
+<textarea id="resultArea" name="code" cols="160" rows="40" wrap="off"></textarea>
+<center>
+
+<script>
+	function log(str)
+	{
+		console.log(str);
+	}
+
+	var colorArray = {};
+	var memberMap = {};
+	var keywords = {};
+	var kwFontStart = {};
+	kwFontStart["target"] = "<font color=0xFF0000 family=\'courier new\'>"
+	kwFontStart["re"] = new RegExp("KW_FONT_START", "g");
+	var fontEnd = {};
+	fontEnd["target"] = "</font>"
+	fontEnd["re"] = new RegExp("FONT_END", "g");
+
+	function initKeywords()
+	{
+		kws = new Array();
+		kws[kws.length] = "alignas";
+		kws[kws.length] = "continue";
+		kws[kws.length] = "friend";
+		kws[kws.length] = "register";
+		kws[kws.length] = "true";
+		kws[kws.length] = "alignof";
+		kws[kws.length] = "decltype";
+		kws[kws.length] = "goto";
+		kws[kws.length] = "reinterpret_cast";
+		kws[kws.length] = "try";
+		kws[kws.length] = "asm";
+		kws[kws.length] = "default";
+		kws[kws.length] = "if";
+		kws[kws.length] = "return";
+		kws[kws.length] = "typedef";
+		kws[kws.length] = "auto";
+		kws[kws.length] = "delete";
+		kws[kws.length] = "inline";
+		kws[kws.length] = "short";
+		kws[kws.length] = "typeid";
+		kws[kws.length] = "bool";
+		kws[kws.length] = "do";
+		kws[kws.length] = "int";
+		kws[kws.length] = "signed";
+		kws[kws.length] = "typename";
+		kws[kws.length] = "break";
+		kws[kws.length] = "double";
+		kws[kws.length] = "long";
+		kws[kws.length] = "sizeof";
+		kws[kws.length] = "union";
+		kws[kws.length] = "case";
+		kws[kws.length] = "dynamic_cast";
+		kws[kws.length] = "mutable";
+		kws[kws.length] = "static";
+		kws[kws.length] = "unsigned";
+		kws[kws.length] = "catch";
+		kws[kws.length] = "else";
+		kws[kws.length] = "namespace";
+		kws[kws.length] = "static_assert";
+		kws[kws.length] = "using";
+		kws[kws.length] = "char";
+		kws[kws.length] = "enum";
+		kws[kws.length] = "new";
+		kws[kws.length] = "static_cast";
+		kws[kws.length] = "virtual";
+		kws[kws.length] = "char16_t";
+		kws[kws.length] = "explicit";
+		kws[kws.length] = "noexcept";
+		kws[kws.length] = "struct";
+		kws[kws.length] = "void";
+		kws[kws.length] = "char32_t";
+		kws[kws.length] = "export";
+		kws[kws.length] = "nullptr";
+		kws[kws.length] = "switch";
+		kws[kws.length] = "volatile";
+		kws[kws.length] = "class";
+		kws[kws.length] = "extern";
+		kws[kws.length] = "operator";
+		kws[kws.length] = "template";
+		kws[kws.length] = "wchar_t";
+		kws[kws.length] = "const";
+		kws[kws.length] = "false";
+		kws[kws.length] = "private";
+		kws[kws.length] = "this";
+		kws[kws.length] = "while";
+		kws[kws.length] = "constexpr";
+		kws[kws.length] = "float";
+		kws[kws.length] = "protected";
+		kws[kws.length] = "thread_local";
+		kws[kws.length] = "const_cast";
+		kws[kws.length] = "for";
+		kws[kws.length] = "public";
+		kws[kws.length] = "throw";
+		keywords = new Array();
+		log("kws length: " + kws.length);
+		for (i = 0; i < kws.length; ++i)
+		{
+			var obj = {};
+			obj["target"] = "KW_FONT_START" + kws[i] + "FONT_END"
+			obj["re"] = new RegExp("\\b" + kws[i] + "\\b", "g");
+			keywords[keywords.length] = obj;
+		}
+	}
+	function initColors()
+	{
+		colorArray = new Array();
+		colorArray[colorArray.length] = "FFB300"; // Vivid Yellow
+		colorArray[colorArray.length] = "803E75"; // Strong Purple
+    	colorArray[colorArray.length] = "FF6800"; // Vivid Orange
+    	colorArray[colorArray.length] = "A6BDD7"; // Very Light Blue
+    	colorArray[colorArray.length] = "C10020"; // Vivid Red
+    	colorArray[colorArray.length] = "CEA262"; // Grayish Yellow
+    	colorArray[colorArray.length] = "817066"; // Medium Gray
+    	colorArray[colorArray.length] = "007D34"; // Vivid Green
+    	colorArray[colorArray.length] = "F6768E"; // Strong Purplish Pink
+    	colorArray[colorArray.length] = "00538A"; // Strong Blue
+    	colorArray[colorArray.length] = "FF7A5C"; // Strong Yellowish Pink
+    	colorArray[colorArray.length] = "53377A"; // Strong Violet
+    	colorArray[colorArray.length] = "FF8E00"; // Vivid Orange Yellow
+    	colorArray[colorArray.length] = "B32851"; // Strong Purplish Red
+    	colorArray[colorArray.length] = "F4C800"; // Vivid Greenish Yellow
+    	colorArray[colorArray.length] = "7F180D"; // Strong Reddish Brown
+    	colorArray[colorArray.length] = "93AA00"; // Vivid Yellowish Green
+    	colorArray[colorArray.length] = "593315"; // Deep Yellowish Brown
+    	colorArray[colorArray.length] = "F13A13"; // Vivid Reddish Orange
+    	colorArray[colorArray.length] = "232C16"; // Dark Olive Green
+	}
+	function init()
+	{
+		memberMap = {};
+		initKeywords();
+		initColors();
+	}
+
+	function parseMembers(str)
+	{
+		var isMemberIntroducer = /(\b[a-zA-Z0-9]*):/g;
+		var discoveredMembersCount = 0;
+		for (nextMember = isMemberIntroducer.exec(str); nextMember; nextMember = isMemberIntroducer.exec(str)) 
+		{
+			if (nextMember[1] in memberMap)
+			{}
+			else
+			{
+				++discoveredMembersCount;
+				var color = colorArray[discoveredMembersCount % colorArray.length];
+				memberMap[nextMember[1]] = {};
+				memberMap[nextMember[1]]["color"] = color;
+				memberMap[nextMember[1]]["name"] = nextMember[1];
+				memberMap[nextMember[1]]["re"] = new RegExp("\\b" + nextMember[1] + "\\b", "g");
+				memberMap[nextMember[1]]["target"]
+					= "<font color=" + color + ">"
+					+ nextMember[1]
+					+ "</font>";
+			}
+		}
+	}
+	function replaceLineEndings(str)
+	{
+		return str.replace(/(?:\r\n|\r|\n)/g, '<br />');
+	}
+	function replaceAllForObject(obj, str)
+	{
+		log("Replacing: " + obj["re"] + " " + obj["target"]);
+		return str.replace(obj["re"], obj["target"]);
+	}
+	function replaceAllForAllMembers(str)
+	{
+		for (var member in memberMap)
+		{
+			if (memberMap.hasOwnProperty(member))
+			{
+				str = replaceAllForObject(memberMap[member], str);
+				log("Found member: " + memberMap[member]["name"])
+			}
+		}
+		return str;
+	}
+	function highlightKeywords(str)
+	{
+		for (var kw in keywords)
+		{
+			str = replaceAllForObject(keywords[kw], str);
+		}
+		str = replaceAllForObject(kwFontStart, str);
+		str = replaceAllForObject(fontEnd, str);
+		return str;
+	}
+	function replaceStrawPolls(str)
+	{
+		var strawPollRegEx = /([0-9]*)\/([0-9]*)\/([0-9]*)\/([0-9]*)\/([0-9]*)/g;
+		for (nextPoll = strawPollRegEx.exec(str); nextPoll; nextPoll = strawPollRegEx.exec(str)) 
+		{
+			pollStr = "\n\n|SF|F|N|A|SA|\n|"
+				+ nextPoll[1] + "|"
+				+ nextPoll[2] + "|"
+				+ nextPoll[3] + "|"
+				+ nextPoll[4] + "|"
+				+ nextPoll[5] + "|\n\n";
+			//log("straw poll: " + nextPoll[0]);
+			str = str.replace(nextPoll[0], pollStr);
+		}
+		return str;
+	}
+
+	function safe_tags(str)
+	{
+		return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*/g,'&#42;') ;
+	}
+	function generateText()
+	{
+		init();
+
+		var ta = document.getElementById("textarea");
+		var oldText = ta.value;
+
+		parseMembers(oldText);
+		var result = oldText;
+		result = safe_tags(result);
+		result = replaceAllForAllMembers(result);
+		//result = highlightKeywords(result);
+		result = replaceLineEndings(result);
+		result = replaceStrawPolls(result);
+
+		document.getElementById("viewable").innerHTML = result;
+		document.getElementById("resultArea").value = result;
+	}
+	
+</script>
+
+
+
+
+
+</center></body></html>
