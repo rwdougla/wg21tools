@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252"></head><body><header>
 <style type="text/css">
-    body {
+	body {
 		background: #002b36;
 		font-family: "Courier";
 		color: #cb4b16;
@@ -143,24 +143,24 @@ TD: Man, if my ******' ex-wife asked me to take care of her ******' dog while sh
 		colorArray = new Array();
 		colorArray[colorArray.length] = "FFB300"; // Vivid Yellow
 		colorArray[colorArray.length] = "803E75"; // Strong Purple
-    	colorArray[colorArray.length] = "FF6800"; // Vivid Orange
-    	colorArray[colorArray.length] = "A6BDD7"; // Very Light Blue
-    	colorArray[colorArray.length] = "C10020"; // Vivid Red
-    	colorArray[colorArray.length] = "CEA262"; // Grayish Yellow
-    	colorArray[colorArray.length] = "817066"; // Medium Gray
-    	colorArray[colorArray.length] = "007D34"; // Vivid Green
-    	colorArray[colorArray.length] = "F6768E"; // Strong Purplish Pink
-    	colorArray[colorArray.length] = "00538A"; // Strong Blue
-    	colorArray[colorArray.length] = "FF7A5C"; // Strong Yellowish Pink
-    	colorArray[colorArray.length] = "53377A"; // Strong Violet
-    	colorArray[colorArray.length] = "FF8E00"; // Vivid Orange Yellow
-    	colorArray[colorArray.length] = "B32851"; // Strong Purplish Red
-    	colorArray[colorArray.length] = "F4C800"; // Vivid Greenish Yellow
-    	colorArray[colorArray.length] = "7F180D"; // Strong Reddish Brown
-    	colorArray[colorArray.length] = "93AA00"; // Vivid Yellowish Green
-    	colorArray[colorArray.length] = "593315"; // Deep Yellowish Brown
-    	colorArray[colorArray.length] = "F13A13"; // Vivid Reddish Orange
-    	colorArray[colorArray.length] = "232C16"; // Dark Olive Green
+		colorArray[colorArray.length] = "FF6800"; // Vivid Orange
+		colorArray[colorArray.length] = "A6BDD7"; // Very Light Blue
+		colorArray[colorArray.length] = "C10020"; // Vivid Red
+		colorArray[colorArray.length] = "CEA262"; // Grayish Yellow
+		colorArray[colorArray.length] = "817066"; // Medium Gray
+		colorArray[colorArray.length] = "007D34"; // Vivid Green
+		colorArray[colorArray.length] = "F6768E"; // Strong Purplish Pink
+		colorArray[colorArray.length] = "00538A"; // Strong Blue
+		colorArray[colorArray.length] = "FF7A5C"; // Strong Yellowish Pink
+		colorArray[colorArray.length] = "53377A"; // Strong Violet
+		colorArray[colorArray.length] = "FF8E00"; // Vivid Orange Yellow
+		colorArray[colorArray.length] = "B32851"; // Strong Purplish Red
+		colorArray[colorArray.length] = "F4C800"; // Vivid Greenish Yellow
+		colorArray[colorArray.length] = "7F180D"; // Strong Reddish Brown
+		colorArray[colorArray.length] = "93AA00"; // Vivid Yellowish Green
+		colorArray[colorArray.length] = "593315"; // Deep Yellowish Brown
+		colorArray[colorArray.length] = "F13A13"; // Vivid Reddish Orange
+		colorArray[colorArray.length] = "232C16"; // Dark Olive Green
 	}
 	function init()
 	{
@@ -171,7 +171,7 @@ TD: Man, if my ******' ex-wife asked me to take care of her ******' dog while sh
 
 	function parseMembers(str)
 	{
-		var isMemberIntroducer = /(\b[a-zA-Z0-9]*):/g;
+		var isMemberIntroducer = /(\b[a-zA-Z0-9]+):/g;
 		var discoveredMembersCount = 0;
 		for (nextMember = isMemberIntroducer.exec(str); nextMember; nextMember = isMemberIntroducer.exec(str)) 
 		{
