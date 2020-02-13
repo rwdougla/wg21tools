@@ -192,8 +192,8 @@ TD: Man, if my ******' ex-wife asked me to take care of her ******' dog while sh
 
 	function excludeMember(memberName)
 	{
-		log("Checking exclusion of: " + memberName);
-		log("exclusion set is: " + [...exclusionSet].join(' '));
+		//log("Checking exclusion of: " + memberName);
+		//log("exclusion set is: " + [...exclusionSet].join(' '));
 		return exclusionSet.has(memberName.toLowerCase());
 	}
 
@@ -229,7 +229,7 @@ TD: Man, if my ******' ex-wife asked me to take care of her ******' dog while sh
 	}
 	function replaceAllForObject(obj, str)
 	{
-		log("Replacing: " + obj["re"] + " " + obj["target"]);
+		//log("Replacing: " + obj["re"] + " " + obj["target"]);
 		return str.replace(obj["re"], obj["target"]);
 	}
 	function replaceAllForAllMembers(str)
@@ -282,16 +282,32 @@ TD: Man, if my ******' ex-wife asked me to take care of her ******' dog while sh
 		var ta = document.getElementById("textarea");
 		var oldText = ta.value;
 
-		parseMembers(oldText);
-		var result = oldText;
-		result = safe_tags(result);
-		result = replaceAllForAllMembers(result);
-		//result = highlightKeywords(result);
-		result = replaceLineEndings(result);
-		result = replaceStrawPolls(result);
+		titleRegEx = /^[-]{3}.*$/gm;
+		var sections = oldText.split(titleRegEx);
+		var titles = oldText.match(titleRegEx);
+		log("Found " + titles.length + " titles");
 
-		document.getElementById("viewable").innerHTML = result;
-		document.getElementById("resultArea").value = result;
+		var finalText = "";
+		for (var i = 0; i < sections.length; ++i)
+		{
+			var result = sections[i];
+			parseMembers(result);
+			result = safe_tags(result);
+			result = replaceAllForAllMembers(result);
+			//result = highlightKeywords(result);
+			result = replaceLineEndings(result);
+			result = replaceStrawPolls(result);
+			if (titles != null && i <= titles.length && i > 0)
+			{
+				log("Adding title: " + titles[i - 1]);
+				finalText += (titles[i - 1] + "\n\n");
+			}
+			log("Adding section");
+			finalText += result + "\n\n";
+		}
+
+		document.getElementById("viewable").innerHTML = finalText;
+		document.getElementById("resultArea").value = finalText;
 	}
 	
 </script>
