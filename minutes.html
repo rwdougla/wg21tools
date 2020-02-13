@@ -43,6 +43,7 @@ TD: Man, if my ******' ex-wife asked me to take care of her ******' dog while sh
 	}
 
 	var colorArray = {};
+	var exclusionSet = new Set();
 	var memberMap = {};
 	var keywords = {};
 	var kwFontStart = {};
@@ -162,11 +163,38 @@ TD: Man, if my ******' ex-wife asked me to take care of her ******' dog while sh
 		colorArray[colorArray.length] = "F13A13"; // Vivid Reddish Orange
 		colorArray[colorArray.length] = "232C16"; // Dark Olive Green
 	}
+
+	function initExcludedWords()
+	{
+		exclusionSet = new Set();
+		exclusionSet.add("http");
+		exclusionSet.add("https");
+		exclusionSet.add("several");
+		exclusionSet.add("group");
+		exclusionSet.add("many");
+		exclusionSet.add("std");
+		exclusionSet.add("ranges");
+		exclusionSet.add("experimental");
+		exclusionSet.add("chrono");
+		exclusionSet.add("literals");
+		exclusionSet.add("range");
+		exclusionSet.add("room");
+		exclusionSet.add("issue");
+	}
+
 	function init()
 	{
 		memberMap = {};
+		initExcludedWords();
 		initKeywords();
 		initColors();
+	}
+
+	function excludeMember(memberName)
+	{
+		log("Checking exclusion of: " + memberName);
+		log("exclusion set is: " + [...exclusionSet].join(' '));
+		return exclusionSet.has(memberName.toLowerCase());
 	}
 
 	function parseMembers(str)
@@ -175,20 +203,23 @@ TD: Man, if my ******' ex-wife asked me to take care of her ******' dog while sh
 		var discoveredMembersCount = 0;
 		for (nextMember = isMemberIntroducer.exec(str); nextMember; nextMember = isMemberIntroducer.exec(str)) 
 		{
-			if (nextMember[1] in memberMap)
-			{}
-			else
+			if (!excludeMember(nextMember[1]))
 			{
-				++discoveredMembersCount;
-				var color = colorArray[discoveredMembersCount % colorArray.length];
-				memberMap[nextMember[1]] = {};
-				memberMap[nextMember[1]]["color"] = color;
-				memberMap[nextMember[1]]["name"] = nextMember[1];
-				memberMap[nextMember[1]]["re"] = new RegExp("\\b" + nextMember[1] + "\\b", "g");
-				memberMap[nextMember[1]]["target"]
-					= "<font color=" + color + ">"
-					+ nextMember[1]
-					+ "</font>";
+				if (nextMember[1] in memberMap)
+				{}
+				else
+				{
+					++discoveredMembersCount;
+					var color = colorArray[discoveredMembersCount % colorArray.length];
+					memberMap[nextMember[1]] = {};
+					memberMap[nextMember[1]]["color"] = color;
+					memberMap[nextMember[1]]["name"] = nextMember[1];
+					memberMap[nextMember[1]]["re"] = new RegExp("\\b" + nextMember[1] + "\\b", "g");
+					memberMap[nextMember[1]]["target"]
+						= "<font color=" + color + ">"
+						+ nextMember[1]
+						+ "</font>";
+				}
 			}
 		}
 	}
